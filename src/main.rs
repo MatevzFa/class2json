@@ -2,7 +2,11 @@
 extern crate clap;
 
 use clap::App;
-use class_file::*;
+use class_file::attributes::*;
+use class_file::ClassFile;
+use class_file::constant_pool::*;
+use class_file::fields::*;
+use class_file::methods::*;
 use read_util::*;
 use std::fs::File;
 use std::io::prelude::*;

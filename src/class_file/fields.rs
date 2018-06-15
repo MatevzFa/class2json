@@ -1,0 +1,1 @@
+pub type FieldInfo = Vec<u8>;

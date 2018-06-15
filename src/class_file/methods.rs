@@ -1,0 +1,1 @@
+pub type MethodInfo = Vec<u8>;

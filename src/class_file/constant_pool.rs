@@ -1,26 +1,4 @@
-use std::boxed::Box;
 use std::fmt;
-
-#[derive(Debug, Default)]
-pub struct ClassFile {
-    pub magic: u32,
-    pub minor_version: u16,
-    pub major_version: u16,
-    pub constant_pool_count: u16,
-    pub constant_pool: Vec<Box<CpInfo>>,
-    pub access_flags: u16,
-    pub this_class: u16,
-    pub super_class: u16,
-    pub interfaces_count: u16,
-    pub interfaces: Vec<u16>,
-    pub fields_count: u16,
-    pub fields: Vec<FieldInfo>,
-    pub methods_count: u16,
-    pub methods: Vec<MethodInfo>,
-    pub attributes_count: u16,
-    pub attributes: Vec<AttributeInfo>,
-}
-
 
 pub trait CpInfo: fmt::Debug {}
 
@@ -252,8 +230,3 @@ pub fn cp_tag_from(tag: u8) -> CpTag {
         _ => panic!("Unknown u8 cptag {:X}", tag),
     }
 }
-
-
-pub type FieldInfo = Vec<u8>;
-pub type MethodInfo = Vec<u8>;
-pub type AttributeInfo = Vec<u8>;
