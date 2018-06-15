@@ -9,7 +9,6 @@ use class_file::fields::*;
 use class_file::methods::*;
 use read_util::*;
 use std::fs::File;
-use std::io::prelude::*;
 
 mod read_util;
 mod class_file;
@@ -53,61 +52,62 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
     let mut constant_pool_remaining = constant_pool_count - 1;
 
     loop {
-        let tag = read_u8(f);
+        let tag_u8 = read_u8(f);
+        let tag = cp_tag_from(tag_u8);
 
-        let cp_info: Box<CpInfo> = match cp_tag_from(tag) {
+        let cp_info: Box<CpInfo> = match tag {
             CpTag::Class => Box::new(ClassInfo {
-                tag: tag,
+                tag: tag_u8,
                 name_index: read_u16(f),
             }),
 
             CpTag::Fieldref => Box::new(FieldrefInfo {
-                tag: tag,
+                tag: tag_u8,
                 class_index: read_u16(f),
                 name_and_type_index: read_u16(f),
             }),
 
             CpTag::Methodref => Box::new(MethodrefInfo {
-                tag: tag,
+                tag: tag_u8,
                 class_index: read_u16(f),
                 name_and_type_index: read_u16(f),
             }),
 
             CpTag::InterfaceMethodref => Box::new(InterfaceMethodrefInfo {
-                tag: tag,
+                tag: tag_u8,
                 class_index: read_u16(f),
                 name_and_type_index: read_u16(f),
             }),
 
             CpTag::String => Box::new(StringInfo {
-                tag: tag,
+                tag: tag_u8,
                 string_index: read_u16(f),
             }),
 
             CpTag::Integer => Box::new(IntegerInfo {
-                tag: tag,
+                tag: tag_u8,
                 bytes: read_u32(f),
             }),
 
             CpTag::Float => Box::new(FloatInfo {
-                tag: tag,
+                tag: tag_u8,
                 bytes: read_u32(f),
             }),
 
             CpTag::Long => Box::new(LongInfo {
-                tag: tag,
+                tag: tag_u8,
                 high_bytes: read_u32(f),
                 low_bytes: read_u32(f),
             }),
 
             CpTag::Double => Box::new(DoubleInfo {
-                tag: tag,
+                tag: tag_u8,
                 high_bytes: read_u32(f),
                 low_bytes: read_u32(f),
             }),
 
             CpTag::NameAndType => Box::new(NameAndTypeInfo {
-                tag: tag,
+                tag: tag_u8,
                 name_index: read_u16(f),
                 descriptor_index: read_u16(f),
             }),
@@ -115,41 +115,45 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
             CpTag::Utf8 => {
                 let length = read_u16(f);
                 Box::new(Utf8Info {
-                    tag: tag,
+                    tag: tag_u8,
                     length: length,
                     bytes: read_vec_u8(f, length as usize),
                 })
             }
 
             CpTag::MethodHandle => Box::new(MethodHandleInfo {
-                tag: tag,
+                tag: tag_u8,
                 reference_kind: read_u8(f),
                 reference_index: read_u16(f),
             }),
 
             CpTag::MethodType => Box::new(MethodTypeInfo {
-                tag: tag,
+                tag: tag_u8,
                 descriptor_index: read_u16(f),
             }),
 
             CpTag::InvokeDynamic => Box::new(InvokeDynamicInfo {
-                tag: tag,
+                tag: tag_u8,
                 bootstrap_method_attr_index: read_u16(f),
                 name_and_type_index: read_u16(f),
             }),
 
             CpTag::Module => Box::new(ModuleInfo {
-                tag: tag,
+                tag: tag_u8,
                 name_index: read_u16(f),
             }),
 
             CpTag::Package => Box::new(PackageInfo {
-                tag: tag,
+                tag: tag_u8,
                 name_index: read_u16(f),
             }),
         };
 
-        constant_pool_remaining = constant_pool_remaining - 1;
+        match tag {
+            CpTag::Long => constant_pool_remaining -= 2,
+            CpTag::Double => constant_pool_remaining -= 2,
+            _ => constant_pool_remaining -= 1,
+        }
 
         cp.push(cp_info);
 

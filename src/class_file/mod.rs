@@ -3,7 +3,6 @@ use self::constant_pool::*;
 use self::fields::*;
 use self::methods::*;
 use std::boxed::Box;
-use std::fmt;
 
 pub mod constant_pool;
 pub mod fields;
