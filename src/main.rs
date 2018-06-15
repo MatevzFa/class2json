@@ -1,12 +1,19 @@
 mod class_file;
 
+#[macro_use]
+extern crate clap;
+use clap::App;
+
 use std::fs::File;
 use std::io::prelude::*;
 
 use class_file::*;
 
 fn main() {
-    let mut f = File::open("class_files/Sum.class").expect("Class file not found");
+    let yaml = load_yaml!("cli.yml");
+    let matches = App::from_yaml(yaml).get_matches();
+
+    let mut f = File::open(matches.value_of("CLASS_FILE").unwrap()).expect("Class file not found");
     let cf = read_classfile(&mut f);
     println!("{:#?}", cf);
 }
