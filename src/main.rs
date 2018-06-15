@@ -1,15 +1,12 @@
-mod class_file;
-
 #[macro_use]
 extern crate clap;
-use clap::App;
 
+use clap::App;
+use class_file::*;
 use std::fs::File;
 use std::io::prelude::*;
-use std::mem;
-use std::slice;
 
-use class_file::*;
+mod class_file;
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
@@ -148,8 +145,6 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
 
         constant_pool_remaining = constant_pool_remaining - 1;
 
-        // println!("Found tag: {:X}", tag);
-
         cp.push(cp_info);
 
         if constant_pool_remaining == 0 {
@@ -175,43 +170,41 @@ fn read_attributes(f: &mut File, attributes_count: u16) -> Vec<AttributeInfo> {
 fn read_u8(f: &mut File) -> u8 {
     let mut buf = [0u8; 1];
     f.read_exact(&mut buf).expect("could not parse u8");
-    let r = { buf[0] as u8 };
-    // println!("{:X}", r);
-    r
+
+    buf[0] as u8
 }
 
 fn read_u16(f: &mut File) -> u16 {
     let mut buf = [0u8; 2];
     f.read_exact(&mut buf).expect("could not parse u16");
-    let r = { (buf[0] as u16) << 8 | (buf[1] as u16) };
-    // println!("{:X}", r);
-    r
+
+    (buf[0] as u16) << 8 | (buf[1] as u16)
 }
 
 fn read_u32(f: &mut File) -> u32 {
     let mut buf = [0u8; 4];
     f.read_exact(&mut buf).expect("could not parse u32");
-    let r =
-        { (buf[0] as u32) << 24 | (buf[1] as u32) << 16 | (buf[2] as u32) << 8 | (buf[3] as u32) };
-    // println!("{:X}", r);
-    r
+
+    (buf[0] as u32) << 24 | (buf[1] as u32) << 16 | (buf[2] as u32) << 8 | (buf[3] as u32)
 }
 
 fn read_vec_u8(f: &mut File, length: usize) -> Vec<u8> {
     let mut buf = vec![0u8; length];
-    f.read_exact(buf.as_mut_slice())
-        .expect("couldnt read cp_info: Utf8");
+    f.read_exact(buf.as_mut_slice()).expect("couldnt read cp_info: Utf8");
+
     buf
 }
 
 fn read_vec_u16(f: &mut File, length: usize) -> Vec<u16> {
-    let mut buf = vec![0u16; length];
-
     use std::slice;
-    let buf_u8 = unsafe {
-        slice::from_raw_parts_mut(buf.as_mut_slice().as_mut_ptr() as *mut u8, buf.len() * 2)
-    };
 
+    let mut buf = vec![0u16; length];
+    let buf_u8 = unsafe {
+        slice::from_raw_parts_mut(
+            buf.as_mut_slice().as_mut_ptr() as *mut u8,
+            buf.len() * 2,
+        )
+    };
     f.read_exact(buf_u8).expect("couldnt read cp_info: Utf8");
 
     buf
