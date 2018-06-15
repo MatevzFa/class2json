@@ -1,0 +1,6 @@
+[package]
+name = "class2json"
+version = "0.1.0"
+authors = ["Matevž Fabjančič <mf6422@student.uni-lj.si>"]
+
+[dependencies]
