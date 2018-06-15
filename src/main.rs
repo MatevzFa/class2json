@@ -48,7 +48,7 @@ fn read_classfile(f: &mut File) -> ClassFile {
 }
 
 fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>> {
-    let mut cp: Vec<Box<CpInfo>> = Vec::new();
+    let mut constant_pool: Vec<Box<CpInfo>> = Vec::new();
     let mut constant_pool_remaining = constant_pool_count - 1;
 
     loop {
@@ -155,18 +155,18 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
             _ => constant_pool_remaining -= 1,
         }
 
-        cp.push(cp_info);
+        constant_pool.push(cp_info);
 
         if constant_pool_remaining == 0 {
             break;
         }
     }
 
-    cp
+    constant_pool
 }
 
 fn read_fields(f: &mut File, fields_count: u16) -> Vec<FieldInfo> {
-    let mut r = Vec::new();
+    let mut fields = Vec::new();
 
     for _ in 0..fields_count {
         let access_flags = read_u16(f);
@@ -174,7 +174,7 @@ fn read_fields(f: &mut File, fields_count: u16) -> Vec<FieldInfo> {
         let descriptor_index = read_u16(f);
         let attributes_count = read_u16(f);
 
-        r.push(FieldInfo {
+        fields.push(FieldInfo {
             access_flags: access_flags,
             name_index: name_index,
             descriptor_index: descriptor_index,
@@ -183,11 +183,11 @@ fn read_fields(f: &mut File, fields_count: u16) -> Vec<FieldInfo> {
         });
     }
 
-    r
+    fields
 }
 
 fn read_methods(f: &mut File, methods_count: u16) -> Vec<MethodInfo> {
-    let mut r = Vec::new();
+    let mut methods = Vec::new();
 
     for _ in 0..methods_count {
         let access_flags = read_u16(f);
@@ -195,7 +195,7 @@ fn read_methods(f: &mut File, methods_count: u16) -> Vec<MethodInfo> {
         let descriptor_index = read_u16(f);
         let attributes_count = read_u16(f);
 
-        r.push(MethodInfo {
+        methods.push(MethodInfo {
             access_flags: access_flags,
             name_index: name_index,
             descriptor_index: descriptor_index,
@@ -204,22 +204,22 @@ fn read_methods(f: &mut File, methods_count: u16) -> Vec<MethodInfo> {
         });
     }
 
-    r
+    methods
 }
 
 fn read_attributes(f: &mut File, attributes_count: u16) -> Vec<AttributeInfo> {
-    let mut r = Vec::new();
+    let mut attributes = Vec::new();
 
     for _ in 0..attributes_count {
         let attribute_name_index = read_u16(f);
         let attribute_length = read_u32(f);
 
-        r.push(AttributeInfo {
+        attributes.push(AttributeInfo {
             attribute_name_index: attribute_name_index,
             attribute_length: attribute_length,
             info: read_vec_u8(f, attribute_length as usize),
         });
     }
 
-    r
+    attributes
 }
