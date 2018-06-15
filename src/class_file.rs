@@ -1,7 +1,7 @@
 use std::boxed::Box;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ClassFile {
     pub magic: u32,
     pub minor_version: u16,
@@ -219,6 +219,6 @@ pub fn cp_tag_from(tag: u8) -> CpTag {
     }
 }
 
-type FieldInfo = Vec<u8>;
-type MethodInfo = Vec<u8>;
-type AttributeInfo = Vec<u8>;
+pub type FieldInfo = Vec<u8>;
+pub type MethodInfo = Vec<u8>;
+pub type AttributeInfo = Vec<u8>;

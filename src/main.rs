@@ -6,6 +6,8 @@ use clap::App;
 
 use std::fs::File;
 use std::io::prelude::*;
+use std::mem;
+use std::slice;
 
 use class_file::*;
 
@@ -19,24 +21,26 @@ fn main() {
 }
 
 fn read_classfile(f: &mut File) -> ClassFile {
-    let cf: ClassFile = ClassFile {
-        magic: read_u32(f),
-        minor_version: read_u16(f),
-        major_version: read_u16(f),
-        constant_pool_count: read_u16(f),
-        constant_pool: read_constant_pool(f, 15),
-        access_flags: 0u16,
-        this_class: 0u16,
-        super_class: 0u16,
-        interfaces_count: 0u16,
-        interfaces: Vec::new(),
-        fields_count: 0u16,
-        fields: Vec::new(),
-        methods_count: 0u16,
-        methods: Vec::new(),
-        attributes_count: 0u16,
-        attributes: Vec::new(),
+    let mut cf: ClassFile = ClassFile {
+        ..Default::default()
     };
+
+    cf.magic = read_u32(f);
+    cf.minor_version = read_u16(f);
+    cf.major_version = read_u16(f);
+    cf.constant_pool_count = read_u16(f);
+    cf.constant_pool = read_constant_pool(f, cf.constant_pool_count);
+    cf.access_flags = read_u16(f);
+    cf.this_class = read_u16(f);
+    cf.super_class = read_u16(f);
+    cf.interfaces_count = read_u16(f);
+    cf.interfaces = read_vec_u16(f, cf.interfaces_count as usize);
+    cf.fields_count = read_u16(f);
+    // cf.fields = read_fields(f, cf.fields_count);
+    // cf.methods_count = 0u16;
+    // cf.methods = read_methods(f, cf.methods_count);
+    // cf.attributes_count = 0u16;
+    // cf.attributes = read_attributes(f, cf.attributes_count);
 
     cf
 }
@@ -107,13 +111,10 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
 
             CpTag::Utf8 => {
                 let length = read_u16(f);
-                let mut buf: Vec<u8> = vec![0u8; length as usize];
-                f.read_exact(buf.as_mut_slice())
-                    .expect("couldnt read cp_info: Utf8");
                 Box::new(Utf8Info {
                     tag: tag,
                     length: length,
-                    bytes: buf,
+                    bytes: read_vec_u8(f, length as usize),
                 })
             }
 
@@ -159,6 +160,18 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
     cp
 }
 
+fn read_fields(f: &mut File, fields_count: u16) -> Vec<FieldInfo> {
+    unimplemented!()
+}
+
+fn read_methods(f: &mut File, methods_count: u16) -> Vec<MethodInfo> {
+    unimplemented!()
+}
+
+fn read_attributes(f: &mut File, attributes_count: u16) -> Vec<AttributeInfo> {
+    unimplemented!()
+}
+
 fn read_u8(f: &mut File) -> u8 {
     let mut buf = [0u8; 1];
     f.read_exact(&mut buf).expect("could not parse u8");
@@ -182,4 +195,24 @@ fn read_u32(f: &mut File) -> u32 {
         { (buf[0] as u32) << 24 | (buf[1] as u32) << 16 | (buf[2] as u32) << 8 | (buf[3] as u32) };
     // println!("{:X}", r);
     r
+}
+
+fn read_vec_u8(f: &mut File, length: usize) -> Vec<u8> {
+    let mut buf = vec![0u8; length];
+    f.read_exact(buf.as_mut_slice())
+        .expect("couldnt read cp_info: Utf8");
+    buf
+}
+
+fn read_vec_u16(f: &mut File, length: usize) -> Vec<u16> {
+    let mut buf = vec![0u16; length];
+
+    use std::slice;
+    let buf_u8 = unsafe {
+        slice::from_raw_parts_mut(buf.as_mut_slice().as_mut_ptr() as *mut u8, buf.len() * 2)
+    };
+
+    f.read_exact(buf_u8).expect("couldnt read cp_info: Utf8");
+
+    buf
 }
