@@ -1,14 +1,16 @@
 #[macro_use]
 extern crate clap;
 
+use std::fs::File;
+
 use clap::App;
+
 use class_file::attributes::*;
 use class_file::ClassFile;
 use class_file::constant_pool::*;
 use class_file::fields::*;
 use class_file::methods::*;
 use read_util::*;
-use std::fs::File;
 
 mod read_util;
 mod class_file;
@@ -47,7 +49,7 @@ fn read_classfile(f: &mut File) -> ClassFile {
     cf
 }
 
-fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>> {
+fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> ConstantPool {
     let mut constant_pool: Vec<Box<CpInfo>> = Vec::new();
     let mut constant_pool_remaining = constant_pool_count - 1;
 
@@ -162,10 +164,10 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
         }
     }
 
-    constant_pool
+    ConstantPool { array: constant_pool }
 }
 
-fn read_fields(f: &mut File, fields_count: u16) -> Vec<FieldInfo> {
+fn read_fields(f: &mut File, fields_count: u16) -> Fields {
     let mut fields = Vec::new();
 
     for _ in 0..fields_count {
@@ -183,10 +185,10 @@ fn read_fields(f: &mut File, fields_count: u16) -> Vec<FieldInfo> {
         });
     }
 
-    fields
+    Fields { array: fields }
 }
 
-fn read_methods(f: &mut File, methods_count: u16) -> Vec<MethodInfo> {
+fn read_methods(f: &mut File, methods_count: u16) -> Methods {
     let mut methods = Vec::new();
 
     for _ in 0..methods_count {
@@ -204,10 +206,10 @@ fn read_methods(f: &mut File, methods_count: u16) -> Vec<MethodInfo> {
         });
     }
 
-    methods
+    Methods { array: methods }
 }
 
-fn read_attributes(f: &mut File, attributes_count: u16) -> Vec<AttributeInfo> {
+fn read_attributes(f: &mut File, attributes_count: u16) -> Attributes {
     let mut attributes = Vec::new();
 
     for _ in 0..attributes_count {
@@ -221,5 +223,5 @@ fn read_attributes(f: &mut File, attributes_count: u16) -> Vec<AttributeInfo> {
         });
     }
 
-    attributes
+    Attributes { array: attributes }
 }

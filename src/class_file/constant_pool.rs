@@ -2,6 +2,10 @@ use std::fmt;
 
 pub trait CpInfo: fmt::Debug {}
 
+#[derive(Debug, Default)]
+pub struct ConstantPool {
+    pub array: Vec<Box<CpInfo>>,
+}
 
 #[derive(Debug)]
 pub struct ClassInfo {

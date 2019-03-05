@@ -1,4 +1,10 @@
 use class_file::attributes::AttributeInfo;
+use class_file::attributes::Attributes;
+
+#[derive(Debug, Default)]
+pub struct Fields {
+    pub array: Vec<FieldInfo>,
+}
 
 #[derive(Debug)]
 pub struct FieldInfo {
@@ -6,5 +12,5 @@ pub struct FieldInfo {
     pub name_index: u16,
     pub descriptor_index: u16,
     pub attributes_count: u16,
-    pub attributes: Vec<AttributeInfo>,
+    pub attributes: Attributes,
 }
