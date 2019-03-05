@@ -1,12 +1,12 @@
+use serde::Serialize;
+
+use class_file::Array;
 use class_file::attributes::AttributeInfo;
 use class_file::attributes::Attributes;
 
-#[derive(Debug, Default)]
-pub struct Fields {
-    pub array: Vec<FieldInfo>,
-}
+pub type Fields = Array<FieldInfo>;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Serialize)]
 pub struct FieldInfo {
     pub access_flags: u16,
     pub name_index: u16,

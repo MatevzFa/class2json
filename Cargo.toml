@@ -5,3 +5,6 @@ authors = ["Matevž Fabjančič <mf6422@student.uni-lj.si>"]
 
 [dependencies]
 clap = {version = "2.31", features = ["yaml"]}
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
