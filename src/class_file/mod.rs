@@ -1,5 +1,7 @@
 use serde::ser::{Serialize, Serializer, SerializeSeq};
 
+use serialization::*;
+
 use self::attributes::*;
 use self::constant_pool::*;
 use self::fields::*;
@@ -12,20 +14,33 @@ pub mod attributes;
 
 #[derive(Debug, Default, serde::Serialize)]
 pub struct ClassFile {
+    #[serde(serialize_with = "serialize_u32_hex")]
     pub magic: u32,
+
+    #[serde(serialize_with = "serialize_u16_hex")]
     pub minor_version: u16,
+
+    #[serde(serialize_with = "serialize_u16_hex")]
     pub major_version: u16,
+
     pub constant_pool_count: u16,
     pub constant_pool: ConstantPool,
+
+    #[serde(serialize_with = "serialize_u16_hex")]
     pub access_flags: u16,
+
     pub this_class: u16,
     pub super_class: u16,
+
     pub interfaces_count: u16,
     pub interfaces: Vec<u16>,
+
     pub fields_count: u16,
     pub fields: Fields,
+
     pub methods_count: u16,
     pub methods: Methods,
+
     pub attributes_count: u16,
     pub attributes: Attributes,
 }

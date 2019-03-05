@@ -1,3 +1,5 @@
+#![allow(dead_code, unused_imports)]
+
 #[macro_use]
 extern crate clap;
 #[macro_use]
@@ -17,6 +19,7 @@ use read_util::*;
 
 mod read_util;
 mod class_file;
+mod serialization;
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
@@ -26,7 +29,7 @@ fn main() {
     let cf = read_classfile(&mut f);
 
     let serialized = serde_json::to_string_pretty(&cf).unwrap();
-    println!("serialized = {}", serialized);
+    println!("{}", serialized);
 }
 
 fn read_classfile(f: &mut File) -> ClassFile {
