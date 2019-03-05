@@ -1,13 +1,31 @@
 use std::fmt;
 
-pub trait CpInfo: fmt::Debug {}
+use serde::ser::{Serialize, Serializer, SerializeSeq};
+use serde::Serialize as SerializeDer;
+
+pub trait CpInfo: fmt::Debug + erased_serde::Serialize {}
+
+serialize_trait_object!(CpInfo);
 
 #[derive(Debug, Default)]
 pub struct ConstantPool {
-    pub array: Vec<Box<CpInfo>>,
+    pub array: Vec<Box<CpInfo>>
 }
 
-#[derive(Debug)]
+impl Serialize for ConstantPool {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: Serializer {
+        let mut seq = serializer.serialize_seq(Some(self.array.len()))?;
+
+        for attr in &self.array {
+            seq.serialize_element(&attr)?;
+        }
+
+        seq.end()
+    }
+}
+
+#[derive(Debug, SerializeDer)]
 pub struct ClassInfo {
     pub tag: u8,
     pub name_index: u16,
@@ -16,7 +34,7 @@ pub struct ClassInfo {
 impl CpInfo for ClassInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct FieldrefInfo {
     pub tag: u8,
     pub class_index: u16,
@@ -26,7 +44,7 @@ pub struct FieldrefInfo {
 impl CpInfo for FieldrefInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct MethodrefInfo {
     pub tag: u8,
     pub class_index: u16,
@@ -36,7 +54,7 @@ pub struct MethodrefInfo {
 impl CpInfo for MethodrefInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct InterfaceMethodrefInfo {
     pub tag: u8,
     pub class_index: u16,
@@ -46,7 +64,7 @@ pub struct InterfaceMethodrefInfo {
 impl CpInfo for InterfaceMethodrefInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct StringInfo {
     pub tag: u8,
     pub string_index: u16,
@@ -55,7 +73,7 @@ pub struct StringInfo {
 impl CpInfo for StringInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct IntegerInfo {
     pub tag: u8,
     pub bytes: u32,
@@ -64,7 +82,7 @@ pub struct IntegerInfo {
 impl CpInfo for IntegerInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct FloatInfo {
     pub tag: u8,
     pub bytes: u32,
@@ -73,7 +91,7 @@ pub struct FloatInfo {
 impl CpInfo for FloatInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct LongInfo {
     pub tag: u8,
     pub high_bytes: u32,
@@ -83,7 +101,7 @@ pub struct LongInfo {
 impl CpInfo for LongInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct DoubleInfo {
     pub tag: u8,
     pub high_bytes: u32,
@@ -93,7 +111,7 @@ pub struct DoubleInfo {
 impl CpInfo for DoubleInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct NameAndTypeInfo {
     pub tag: u8,
     pub name_index: u16,
@@ -102,7 +120,7 @@ pub struct NameAndTypeInfo {
 
 impl CpInfo for NameAndTypeInfo {}
 
-
+#[derive(SerializeDer)]
 pub struct Utf8Info {
     pub tag: u8,
     pub length: u16,
@@ -122,7 +140,7 @@ impl fmt::Debug for Utf8Info {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct MethodHandleInfo {
     pub tag: u8,
     pub reference_kind: u8,
@@ -132,7 +150,7 @@ pub struct MethodHandleInfo {
 impl CpInfo for MethodHandleInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct MethodTypeInfo {
     pub tag: u8,
     pub descriptor_index: u16,
@@ -141,7 +159,7 @@ pub struct MethodTypeInfo {
 impl CpInfo for MethodTypeInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct InvokeDynamicInfo {
     pub tag: u8,
     pub bootstrap_method_attr_index: u16,
@@ -151,7 +169,7 @@ pub struct InvokeDynamicInfo {
 impl CpInfo for InvokeDynamicInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct ModuleInfo {
     pub tag: u8,
     pub name_index: u16,
@@ -160,7 +178,7 @@ pub struct ModuleInfo {
 impl CpInfo for ModuleInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub struct PackageInfo {
     pub tag: u8,
     pub name_index: u16,
@@ -169,7 +187,7 @@ pub struct PackageInfo {
 impl CpInfo for PackageInfo {}
 
 
-#[derive(Debug)]
+#[derive(Debug, SerializeDer)]
 pub enum CpTag {
     Class,
     Fieldref,
@@ -188,30 +206,6 @@ pub enum CpTag {
     Module,
     Package,
 }
-
-impl CpTag {
-    fn value(&self) -> u8 {
-        match *self {
-            CpTag::Class => 7,
-            CpTag::Fieldref => 9,
-            CpTag::Methodref => 10,
-            CpTag::InterfaceMethodref => 11,
-            CpTag::String => 8,
-            CpTag::Integer => 3,
-            CpTag::Float => 4,
-            CpTag::Long => 5,
-            CpTag::Double => 6,
-            CpTag::NameAndType => 12,
-            CpTag::Utf8 => 1,
-            CpTag::MethodHandle => 15,
-            CpTag::MethodType => 16,
-            CpTag::InvokeDynamic => 18,
-            CpTag::Module => 19,
-            CpTag::Package => 20,
-        }
-    }
-}
-
 
 pub fn cp_tag_from(tag: u8) -> CpTag {
     match tag {

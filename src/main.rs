@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate clap;
 #[macro_use]
+extern crate erased_serde;
 extern crate serde;
 
 use std::fs::File;
@@ -23,9 +24,8 @@ fn main() {
 
     let mut f = File::open(matches.value_of("CLASS_FILE").unwrap()).expect("Class file not found");
     let cf = read_classfile(&mut f);
-    println!("{:#?}", &cf);
 
-    let serialized = serde_json::to_string_pretty(&cf.attributes).unwrap();
+    let serialized = serde_json::to_string_pretty(&cf).unwrap();
     println!("serialized = {}", serialized);
 }
 
@@ -54,7 +54,7 @@ fn read_classfile(f: &mut File) -> ClassFile {
     cf
 }
 
-fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>> {
+fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> ConstantPool {
     let mut constant_pool: Vec<Box<CpInfo>> = Vec::new();
     let mut constant_pool_remaining = constant_pool_count - 1;
 
@@ -169,7 +169,7 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> Vec<Box<CpInfo>
         }
     }
 
-    constant_pool
+    ConstantPool { array: constant_pool }
 }
 
 fn read_fields(f: &mut File, fields_count: u16) -> Fields {

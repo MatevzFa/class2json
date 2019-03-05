@@ -1,7 +1,6 @@
 use serde::Serialize;
 
 use class_file::Array;
-use class_file::attributes::AttributeInfo;
 use class_file::attributes::Attributes;
 
 pub type Fields = Array<FieldInfo>;
