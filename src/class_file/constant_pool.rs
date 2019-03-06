@@ -5,9 +5,10 @@ use serde::Serialize as SerializeDer;
 
 use serialization::*;
 
-pub trait CpInfo: fmt::Debug + erased_serde::Serialize {}
 
+pub trait CpInfo: fmt::Debug + erased_serde::Serialize {}
 serialize_trait_object!(CpInfo);
+
 
 #[derive(Debug, Default)]
 pub struct ConstantPool {
@@ -29,6 +30,7 @@ impl Serialize for ConstantPool {
     }
 }
 
+
 #[derive(Debug, SerializeDer)]
 pub struct ClassInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -37,6 +39,7 @@ pub struct ClassInfo {
 }
 
 impl CpInfo for ClassInfo {}
+
 
 #[derive(Debug, SerializeDer)]
 pub struct FieldrefInfo {
@@ -48,6 +51,7 @@ pub struct FieldrefInfo {
 
 impl CpInfo for FieldrefInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct MethodrefInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -57,6 +61,7 @@ pub struct MethodrefInfo {
 }
 
 impl CpInfo for MethodrefInfo {}
+
 
 #[derive(Debug, SerializeDer)]
 pub struct InterfaceMethodrefInfo {
@@ -68,6 +73,7 @@ pub struct InterfaceMethodrefInfo {
 
 impl CpInfo for InterfaceMethodrefInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct StringInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -76,6 +82,7 @@ pub struct StringInfo {
 }
 
 impl CpInfo for StringInfo {}
+
 
 #[derive(Debug, SerializeDer)]
 pub struct IntegerInfo {
@@ -86,6 +93,7 @@ pub struct IntegerInfo {
 
 impl CpInfo for IntegerInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct FloatInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -94,6 +102,7 @@ pub struct FloatInfo {
 }
 
 impl CpInfo for FloatInfo {}
+
 
 #[derive(Debug, SerializeDer)]
 pub struct LongInfo {
@@ -108,6 +117,7 @@ pub struct LongInfo {
 
 impl CpInfo for LongInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct DoubleInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -121,6 +131,7 @@ pub struct DoubleInfo {
 
 impl CpInfo for DoubleInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct NameAndTypeInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -130,6 +141,7 @@ pub struct NameAndTypeInfo {
 }
 
 impl CpInfo for NameAndTypeInfo {}
+
 
 #[derive(SerializeDer)]
 pub struct Utf8Info {
@@ -166,6 +178,7 @@ pub struct MethodHandleInfo {
 
 impl CpInfo for MethodHandleInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct MethodTypeInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -174,6 +187,7 @@ pub struct MethodTypeInfo {
 }
 
 impl CpInfo for MethodTypeInfo {}
+
 
 #[derive(Debug, SerializeDer)]
 pub struct InvokeDynamicInfo {
@@ -185,6 +199,7 @@ pub struct InvokeDynamicInfo {
 
 impl CpInfo for InvokeDynamicInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct ModuleInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -194,6 +209,7 @@ pub struct ModuleInfo {
 
 impl CpInfo for ModuleInfo {}
 
+
 #[derive(Debug, SerializeDer)]
 pub struct PackageInfo {
     #[serde(serialize_with = "serialize_u8_hex")]
@@ -202,6 +218,7 @@ pub struct PackageInfo {
 }
 
 impl CpInfo for PackageInfo {}
+
 
 #[derive(Debug, SerializeDer)]
 pub enum CpTag {
