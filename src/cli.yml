@@ -1,7 +1,11 @@
 name: class2json
 about: Dumps a Java Class File in JSON format.
 args:
-    - CLASS_FILE:
-        help: Path to the class file
-        required: true
-        index: 1
+- CLASS_FILE:
+    help: Path to the class file
+    required: true
+    index: 1
+- pretty:
+    help: Pretty-print the JSON
+    short: p
+    long: pretty

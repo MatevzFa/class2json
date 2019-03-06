@@ -7,6 +7,7 @@ extern crate erased_serde;
 extern crate serde;
 
 use std::fs::File;
+use std::io::Read;
 
 use clap::App;
 
@@ -16,7 +17,6 @@ use class_file::constant_pool::*;
 use class_file::fields::*;
 use class_file::methods::*;
 use read_util::*;
-use std::io::Read;
 
 mod read_util;
 mod class_file;
@@ -29,7 +29,11 @@ fn main() {
     let mut f = File::open(matches.value_of("CLASS_FILE").unwrap()).expect("Class file not found");
     let cf = read_classfile(&mut f);
 
-    println!("{}", cf.to_pretty_json());
+    if matches.is_present("pretty") {
+        println!("{}", cf.to_pretty_json());
+    } else {
+        println!("{}", cf.to_json());
+    }
 }
 
 fn read_classfile(f: &mut Read) -> ClassFile {
