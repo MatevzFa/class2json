@@ -16,6 +16,7 @@ use class_file::constant_pool::*;
 use class_file::fields::*;
 use class_file::methods::*;
 use read_util::*;
+use std::io::Read;
 
 mod read_util;
 mod class_file;
@@ -28,11 +29,10 @@ fn main() {
     let mut f = File::open(matches.value_of("CLASS_FILE").unwrap()).expect("Class file not found");
     let cf = read_classfile(&mut f);
 
-    let serialized = serde_json::to_string_pretty(&cf).unwrap();
-    println!("{}", serialized);
+    println!("{}", cf.to_pretty_json());
 }
 
-fn read_classfile(f: &mut File) -> ClassFile {
+fn read_classfile(f: &mut Read) -> ClassFile {
     let mut cf: ClassFile = ClassFile {
         ..Default::default()
     };
@@ -57,7 +57,7 @@ fn read_classfile(f: &mut File) -> ClassFile {
     cf
 }
 
-fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> ConstantPool {
+fn read_constant_pool(f: &mut Read, constant_pool_count: u16) -> ConstantPool {
     let mut constant_pool: Vec<Box<CpInfo>> = Vec::new();
     let mut constant_pool_remaining = constant_pool_count - 1;
 
@@ -175,7 +175,7 @@ fn read_constant_pool(f: &mut File, constant_pool_count: u16) -> ConstantPool {
     ConstantPool { array: constant_pool }
 }
 
-fn read_fields(f: &mut File, fields_count: u16) -> Fields {
+fn read_fields(f: &mut Read, fields_count: u16) -> Fields {
     let mut fields = Vec::new();
 
     for _ in 0..fields_count {
@@ -196,7 +196,7 @@ fn read_fields(f: &mut File, fields_count: u16) -> Fields {
     Fields { array: fields }
 }
 
-fn read_methods(f: &mut File, methods_count: u16) -> Methods {
+fn read_methods(f: &mut Read, methods_count: u16) -> Methods {
     let mut methods = Vec::new();
 
     for _ in 0..methods_count {
@@ -217,7 +217,7 @@ fn read_methods(f: &mut File, methods_count: u16) -> Methods {
     Methods { array: methods }
 }
 
-fn read_attributes(f: &mut File, attributes_count: u16) -> Attributes {
+fn read_attributes(f: &mut Read, attributes_count: u16) -> Attributes {
     let mut attributes = Vec::new();
 
     for _ in 0..attributes_count {

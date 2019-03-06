@@ -45,6 +45,16 @@ pub struct ClassFile {
     pub attributes: Attributes,
 }
 
+impl ClassFile {
+    pub fn to_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+
+    pub fn to_pretty_json(&self) -> String {
+        serde_json::to_string_pretty(&self).unwrap()
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct Array<T: Serialize> {
     pub array: Vec<T>
