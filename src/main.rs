@@ -21,6 +21,7 @@ use read_util::*;
 mod read_util;
 mod class_file;
 mod serialization;
+mod bytecode;
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
